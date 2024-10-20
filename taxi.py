@@ -60,6 +60,7 @@ def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float
         # BEGIN SOLUTION
         agent.update(s, a, r, next_s)
         total_reward += r
+        s = next_s
         if done:
             break
         # END SOLUTION
@@ -101,7 +102,7 @@ assert np.mean(rewards[-100:]) > 0.0
 ####################
 
 
-agent = SARSAAgent(learning_rate=0.5, gamma=0.99, legal_actions=list(range(n_actions)))
+agent = SARSAAgent(learning_rate=0.2, gamma=0.99, legal_actions=list(range(n_actions)))
 
 rewards = []
 for i in range(1000):
