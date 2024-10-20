@@ -49,6 +49,7 @@ class QLearningAgent:
         """
         value = 0.0
         # BEGIN SOLUTION
+        value = max(self.get_qvalue(state, action) for action in self.legal_actions)
         # END SOLUTION
         return value
 
@@ -56,13 +57,18 @@ class QLearningAgent:
         self, state: State, action: Action, reward: t.SupportsFloat, next_state: State
     ):
         """
-        You should do your Q-Value update here (s'=next_state):
-           TD_target(s') = r + gamma * max_a' Q(s', a')
-           TD_error(s', a) = TD_target(s') - Q_old(s, a)
-           Q_new(s, a) := Q_old(s, a) + learning_rate * TD_error(s', a)
+        You should do your Q-Value update here:
+
+           TD_target(s, a, r, s') = r + gamma * V(s')
+           TD_error(s, a, r, s') = TD_target(s, a, r, s') - Q_old(s, a)
+           Q_new(s, a) := Q_old(s, a) + learning_rate * TD_error(s, a, R(s, a), s')
         """
         q_value = 0.0
         # BEGIN SOLUTION
+        old_qvalue = self.get_qvalue(state, action)
+        td_target = reward + self.gamma * self.get_qvalue(next_state, action)
+        td_error = td_target - old_qvalue
+        q_value = old_qvalue + self.learning_rate * td_error
         # END SOLUTION
 
         self.set_qvalue(state, action, q_value)
@@ -82,8 +88,6 @@ class QLearningAgent:
         """
         Compute the action to take in the current state, including exploration.
 
-        Exploration is done with epsilon-greey. Namely, with probability self.epsilon, we should take a random action, and otherwise the best policy action (self.get_best_action).
-
         Note: To pick randomly from a list, use random.choice(list).
               To pick True or False with a given probablity, generate uniform number in [0, 1]
               and compare it with your probability
@@ -91,6 +95,10 @@ class QLearningAgent:
         action = self.legal_actions[0]
 
         # BEGIN SOLUTION
+        if random.random() <= self.epsilon:
+            action = random.choice(self.legal_actions)
+        else:
+            action = self.get_best_action(state)
         # END SOLUTION
 
         return action
